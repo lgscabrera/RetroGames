@@ -1,4 +1,5 @@
 using RetroGames.WebApi.Configuration;
+using RetroGames.WebApi.Middlewares;
 
 // Carrega o .env (procura na pasta atual e nas de cima). Precisa vir antes do CreateBuilder.
 DotNetEnv.Env.TraversePath().Load();
@@ -17,8 +18,12 @@ builder.Services.AddRepositorios(connectionString);
 builder.Services.AddServicosDeNegocio();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();   // primeira etapa do pipeline
 
 if (app.Environment.IsDevelopment())
 {
