@@ -1,4 +1,6 @@
+using FluentValidation;
 using RetroGames.WebApi.Configuration;
+using RetroGames.WebApi.Filters;
 using RetroGames.WebApi.Middlewares;
 
 // Carrega o .env (procura na pasta atual e nas de cima). Precisa vir antes do CreateBuilder.
@@ -16,7 +18,10 @@ if (string.IsNullOrWhiteSpace(connectionString))
 
 builder.Services.AddRepositorios(connectionString);
 builder.Services.AddServicosDeNegocio();
-builder.Services.AddControllers();
+builder.Services.AddControllers(opcoes => opcoes.Filters.Add<FluentValidationFilter>())
+    .ConfigureApiBehaviorOptions(opcoes =>
+        opcoes.InvalidModelStateResponseFactory = FluentValidationFilter.RespostaModeloInvalido);
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddOpenApi();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
