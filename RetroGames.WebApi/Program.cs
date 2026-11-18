@@ -1,4 +1,5 @@
 using FluentValidation;
+using RetroGames.Services;
 using RetroGames.WebApi.Configuration;
 using RetroGames.WebApi.Filters;
 using RetroGames.WebApi.Middlewares;
@@ -27,6 +28,21 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 var app = builder.Build();
+
+// Administrador inicial (RS05): e-mail e senha vêm do .env e nunca vão para o log.
+var emailAdministrador = builder.Configuration["AdminInicial:Email"];
+var senhaAdministrador = builder.Configuration["AdminInicial:Senha"];
+if (!string.IsNullOrWhiteSpace(emailAdministrador) && !string.IsNullOrWhiteSpace(senhaAdministrador))
+{
+    using var escopo = app.Services.CreateScope();
+    var autenticacaoService = escopo.ServiceProvider.GetRequiredService<IAutenticacaoService>();
+    await autenticacaoService.GarantirAdministradorInicialAsync(emailAdministrador, senhaAdministrador);
+}
+else
+{
+    app.Logger.LogWarning(
+        "AdminInicial__Email e AdminInicial__Senha não definidos no .env: nenhum administrador foi criado.");
+}
 
 app.UseExceptionHandler();   // primeira etapa do pipeline
 
