@@ -1,4 +1,5 @@
 using RetroGames.Model.Consultas;
+using RetroGames.Model.Model;
 using RetroGames.Services;
 using RetroGames.WebApi.ApiModels;
 
@@ -44,6 +45,30 @@ public static class JogoMapper
         IdCondicaoJogo = detalhe.Jogo.IdCondicaoJogo,
         DescricaoCondicao = detalhe.DescricaoCondicao,
         Generos = detalhe.Generos.Select(g => g.ParaResponse()).ToList(),
+    };
+
+    public static Jogo ParaModel(this InserirJogoRequestApiModel request) => new()
+    {
+        Nome = request.Nome,
+        Descricao = request.Descricao,
+        AnoLancamento = request.AnoLancamento,
+        Preco = request.Preco,
+        Estoque = request.Estoque,
+        IdPlataforma = request.IdPlataforma,
+        IdCondicaoJogo = request.IdCondicaoJogo,
+    };
+
+    // O id vem da rota, nunca do corpo.
+    public static Jogo ParaModel(this AlterarJogoRequestApiModel request, int id) => new()
+    {
+        Id = id,
+        Nome = request.Nome,
+        Descricao = request.Descricao,
+        AnoLancamento = request.AnoLancamento,
+        Preco = request.Preco,
+        Estoque = request.Estoque,
+        IdPlataforma = request.IdPlataforma,
+        IdCondicaoJogo = request.IdCondicaoJogo,
     };
 
     public static PaginaResponseApiModel<ListarJogoResponseApiModel> ParaPaginaResponse(

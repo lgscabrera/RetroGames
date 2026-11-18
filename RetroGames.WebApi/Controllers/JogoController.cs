@@ -25,4 +25,29 @@ public class JogoController(IJogoService jogoService) : ControllerBase
         var detalhe = await jogoService.BuscarPorIdAsync(id);
         return Ok(new RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>(detalhe.ParaResponse()));
     }
+
+    [HttpPost]
+    public async Task<ActionResult<RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>>> Inserir(
+        [FromBody] InserirJogoRequestApiModel? request)
+    {
+        var detalhe = await jogoService.InserirAsync(request!.ParaModel(), request.IdsGeneros);
+        return CreatedAtAction(nameof(ListarPorId), new { id = detalhe.Jogo.Id },
+            new RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>(detalhe.ParaResponse()));
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>>> Alterar(
+        int id, [FromBody] AlterarJogoRequestApiModel? request)
+    {
+        var detalhe = await jogoService.AlterarAsync(request!.ParaModel(id), request.IdsGeneros);
+        return Ok(new RetroGamesResponseApiModel<ListarPorIdJogoResponseApiModel>(detalhe.ParaResponse()));
+    }
+
+    // RN03: o jogo nunca é apagado, só desativado.
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult<RetroGamesResponseApiModel>> Desativar(int id)
+    {
+        await jogoService.DesativarAsync(id);
+        return Ok(new RetroGamesResponseApiModel());
+    }
 }
