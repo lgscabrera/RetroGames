@@ -19,6 +19,8 @@ if (string.IsNullOrWhiteSpace(connectionString))
 
 builder.Services.AddRepositorios(connectionString);
 builder.Services.AddServicosDeNegocio();
+builder.Services.AddAutenticacaoPorCookie(builder.Environment);
+builder.Services.AddAuthorization();
 builder.Services.AddControllers(opcoes => opcoes.Filters.Add<FluentValidationFilter>())
     .ConfigureApiBehaviorOptions(opcoes =>
         opcoes.InvalidModelStateResponseFactory = FluentValidationFilter.RespostaModeloInvalido);
@@ -51,6 +53,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseSwaggerUI(opcoes => opcoes.SwaggerEndpoint("/openapi/v1.json", "RetroGames API v1"));
 }
+
+app.UseAuthentication();   // lê o cookie: quem é você?
+app.UseAuthorization();    // políticas: você pode?
 
 app.MapControllers();
 app.Run();
