@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authorization;
+using RetroGames.WebApi.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using RetroGames.Services;
 using RetroGames.WebApi.ApiModels;
@@ -9,6 +11,7 @@ namespace RetroGames.WebApi.Controllers;
 [Route("api/[controller]")]
 public class PlataformaController(IPlataformaService plataformaService) : ControllerBase
 {
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<RetroGamesResponseApiModel<List<ListarPlataformaResponseApiModel>>>> Listar()
     {
@@ -17,6 +20,7 @@ public class PlataformaController(IPlataformaService plataformaService) : Contro
             plataformas.Select(p => p.ParaResponse()).ToList()));
     }
 
+    [AllowAnonymous]
     [HttpGet("{id:int}")]
     public async Task<ActionResult<RetroGamesResponseApiModel<ListarPlataformaResponseApiModel>>> ListarPorId(int id)
     {
@@ -25,6 +29,7 @@ public class PlataformaController(IPlataformaService plataformaService) : Contro
     }
 
     // O "?" deixa o corpo opcional para o ASP.NET; o filtro de validação responde 400 (código 2) se faltar.
+    [Authorize(Policy = Politicas.Administrador)]
     [HttpPost]
     public async Task<ActionResult<RetroGamesResponseApiModel<ListarPlataformaResponseApiModel>>> Inserir(
         [FromBody] InserirPlataformaRequestApiModel? request)
@@ -34,6 +39,7 @@ public class PlataformaController(IPlataformaService plataformaService) : Contro
             new RetroGamesResponseApiModel<ListarPlataformaResponseApiModel>(criada.ParaResponse()));
     }
 
+    [Authorize(Policy = Politicas.Administrador)]
     [HttpPut("{id:int}")]
     public async Task<ActionResult<RetroGamesResponseApiModel<ListarPlataformaResponseApiModel>>> Alterar(
         int id, [FromBody] AlterarPlataformaRequestApiModel? request)
@@ -42,6 +48,7 @@ public class PlataformaController(IPlataformaService plataformaService) : Contro
         return Ok(new RetroGamesResponseApiModel<ListarPlataformaResponseApiModel>(alterada.ParaResponse()));
     }
 
+    [Authorize(Policy = Politicas.Administrador)]
     [HttpDelete("{id:int}")]
     public async Task<ActionResult<RetroGamesResponseApiModel>> Excluir(int id)
     {

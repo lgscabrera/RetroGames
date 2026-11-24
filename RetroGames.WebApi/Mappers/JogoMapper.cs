@@ -7,13 +7,12 @@ namespace RetroGames.WebApi.Mappers;
 
 public static class JogoMapper
 {
-    // O IncluirInativos fica falso: só o administrador verá jogos inativos (aula 6).
     public static JogoFiltro ParaFiltro(this ListarJogoRequestApiModel request) => new()
     {
         Busca = request.Busca,
         IdPlataforma = request.IdPlataforma,
         IdGenero = request.IdGenero,
-        IncluirInativos = false,
+        IncluirInativos = request.IncluirInativos,   // o JogoService só respeita se for administrador
         Pagina = Math.Max(request.Pagina, 1),
         TamanhoPagina = Math.Max(request.TamanhoPagina, 1),
     };

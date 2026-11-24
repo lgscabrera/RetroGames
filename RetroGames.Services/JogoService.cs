@@ -14,10 +14,13 @@ public interface IJogoService
     Task DesativarAsync(int id);
 }
 
-public class JogoService(IRepositorySet repositorio) : IJogoService
+public class JogoService(IRepositorySet repositorio, IUsuarioAtualService usuarioAtual) : IJogoService
 {
     public async Task<ResultadoPaginado<JogoDetalheServiceModel>> ListarAsync(JogoFiltro filtro)
     {
+        // RN04: incluirInativos só vale para o administrador.
+        filtro.IncluirInativos = filtro.IncluirInativos && usuarioAtual.EhAdministrador;
+
         // Filtro por gênero: resolvido aqui com LINQ; o Repository recebe só a lista de ids.
         if (filtro.IdGenero.HasValue)
         {
@@ -41,6 +44,8 @@ public class JogoService(IRepositorySet repositorio) : IJogoService
     {
         var jogo = await repositorio.Jogo.BuscarPorIdAsync(id)
                    ?? throw new BusinessRuleException(BusinessErrors.JOGO_NAO_ENCONTRADO);
+        if (!jogo.Ativo && !usuarioAtual.EhAdministrador)   // RN04: inativo é 404 para os demais
+            throw new BusinessRuleException(BusinessErrors.JOGO_NAO_ENCONTRADO);
         return (await MontarDetalhesAsync(new List<Jogo> { jogo })).Single();
     }
 
