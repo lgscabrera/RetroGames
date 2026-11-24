@@ -26,3 +26,7 @@ export const autenticacaoApi = {
   sair: () => api.post('/Autenticacao/logout'),
   usuarioAtual: () => api.get('/Autenticacao/eu').then(dados),
 }
+
+export const condicaoApi = {
+  listar: () => api.get('/CondicaoJogo').then(dados),
+}
