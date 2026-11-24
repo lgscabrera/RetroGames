@@ -14,3 +14,9 @@ export const plataformaApi = {
 export const generoApi = {
   listar: () => api.get('/Genero').then(dados),
 }
+
+export const autenticacaoApi = {
+  entrar: (email, senha) => api.post('/Autenticacao/login', { email, senha }).then(dados),
+  sair: () => api.post('/Autenticacao/logout'),
+  usuarioAtual: () => api.get('/Autenticacao/eu').then(dados),
+}
