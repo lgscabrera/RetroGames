@@ -22,9 +22,15 @@ export const generoApi = {
 }
 
 export const autenticacaoApi = {
+  cadastrar: (nome, email, senha) => api.post('/Autenticacao/cadastrar', { nome, email, senha }).then(dados),
   entrar: (email, senha) => api.post('/Autenticacao/login', { email, senha }).then(dados),
   sair: () => api.post('/Autenticacao/logout'),
   usuarioAtual: () => api.get('/Autenticacao/eu').then(dados),
+}
+
+export const pedidoApi = {
+  finalizar: (itens) => api.post('/Pedido', { itens }).then(dados),
+  meus: () => api.get('/Pedido/meus').then(dados),
 }
 
 export const condicaoApi = {

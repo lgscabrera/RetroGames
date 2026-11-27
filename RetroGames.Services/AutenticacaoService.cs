@@ -8,6 +8,7 @@ namespace RetroGames.Services;
 public interface IAutenticacaoService
 {
     Task<Usuario?> AutenticarAsync(string email, string senha);
+    Task<Usuario> CadastrarClienteAsync(string nome, string email, string senha);
     Task GarantirAdministradorInicialAsync(string email, string senha);
 }
 
@@ -26,6 +27,30 @@ public class AutenticacaoService(IRepositorySet repositorio, IPasswordHasher<Usu
     }
 
     // Chamado na inicialização da API: cria o primeiro administrador só se ainda não houver nenhum.
+    public async Task<Usuario> CadastrarClienteAsync(string nome, string email, string senha)
+    {
+        var usuario = new Usuario
+        {
+            Nome = nome.Trim(),
+            Email = email.Trim().ToLowerInvariant(),
+            Ativo = true,
+            IdPerfil = PerfilIds.Cliente,
+        };
+
+        usuario.SenhaHash = hasher.HashPassword(usuario, senha);
+
+        try
+        {
+            usuario.Id = await repositorio.Usuario.InserirAsync(usuario);
+        }
+        catch (RegistroDuplicadoException)
+        {
+            throw new BusinessRuleException(BusinessErrors.USUARIO_EMAIL_DUPLICADO);
+        }
+
+        return usuario;
+    }
+
     public async Task GarantirAdministradorInicialAsync(string email, string senha)
     {
         if (await repositorio.Usuario.ExisteAdministradorAsync())

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAutenticacao } from '../../hooks/useAutenticacao'
 import { obterMensagemErro } from '../../api/erros'
 
@@ -51,6 +51,9 @@ export default function Login() {
             {enviando ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
+        <p className="text-center mt-3 mb-0">
+          <Link to="/cadastro">Cadastrar cliente</Link>
+        </p>
       </div>
     </div>
   )

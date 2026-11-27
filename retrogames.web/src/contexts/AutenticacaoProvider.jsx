@@ -25,6 +25,11 @@ export default function AutenticacaoProvider({ children }) {
     setUsuario(await autenticacaoApi.usuarioAtual())
   }, [])
 
+  const cadastrar = useCallback(async (nome, email, senha) => {
+    await autenticacaoApi.cadastrar(nome, email, senha)
+    setUsuario(await autenticacaoApi.usuarioAtual())
+  }, [])
+
   const sair = useCallback(async () => {
     try {
       await autenticacaoApi.sair()
@@ -40,9 +45,10 @@ export default function AutenticacaoProvider({ children }) {
       estaAutenticado: usuario !== null,
       ehAdministrador: usuario?.perfil === 'Administrador',
       entrar,
+      cadastrar,
       sair,
     }),
-    [usuario, carregando, entrar, sair]
+    [usuario, carregando, entrar, cadastrar, sair]
   )
 
   return <AutenticacaoContext.Provider value={valor}>{children}</AutenticacaoContext.Provider>

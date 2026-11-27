@@ -14,6 +14,18 @@ namespace RetroGames.WebApi.Controllers;
 public class AutenticacaoController(IAutenticacaoService autenticacaoService) : ControllerBase
 {
     [AllowAnonymous]
+    [HttpPost("cadastrar")]
+    [HttpPost("cadastrar-cliente")]
+    public async Task<ActionResult<RetroGamesResponseApiModel<UsuarioLogadoResponseApiModel>>> CadastrarCliente(
+        [FromBody] CadastrarClienteRequestApiModel? request)
+    {
+        var usuario = await autenticacaoService.CadastrarClienteAsync(request!.Nome, request.Email, request.Senha);
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, usuario.ParaClaimsPrincipal());
+        return StatusCode(StatusCodes.Status201Created,
+            new RetroGamesResponseApiModel<UsuarioLogadoResponseApiModel>(usuario.ParaLogadoResponse()));
+    }
+
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<ActionResult<RetroGamesResponseApiModel<UsuarioLogadoResponseApiModel>>> Login(
         [FromBody] LoginRequestApiModel? request)

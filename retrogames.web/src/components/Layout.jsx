@@ -1,9 +1,11 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom'
 import { useAutenticacao } from '../hooks/useAutenticacao'
+import { useCarrinho } from '../hooks/useCarrinho'
 
 export default function Layout() {
   const { usuario, estaAutenticado, ehAdministrador, sair } = useAutenticacao()
   const navigate = useNavigate()
+  const { quantidadeTotal } = useCarrinho()
 
   const aoSair = async () => {
     await sair()
@@ -32,6 +34,14 @@ export default function Layout() {
           </ul>
 
           <div className="d-flex align-items-center gap-3">
+            {estaAutenticado && !ehAdministrador && (
+              <>
+                <Link className="text-light text-decoration-none" to="/carrinho">
+                  Carrinho ({quantidadeTotal})
+                </Link>
+                <Link className="text-light text-decoration-none" to="/meus-pedidos">Meus pedidos</Link>
+              </>
+            )}
             {estaAutenticado ? (
               <>
                 <span className="navbar-text text-light">Olá, {usuario.nome}</span>

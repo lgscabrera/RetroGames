@@ -8,6 +8,8 @@ public interface IJogoRepository
 {
     Task<ResultadoPaginado<Jogo>> ListarAsync(JogoFiltro filtro);
     Task<Jogo?> BuscarPorIdAsync(int id);
+    Task<List<Jogo>> ListarPorIdsAsync(IEnumerable<int> ids);
+    Task<bool> BaixarEstoqueAsync(int id, int quantidade);
     Task<int> InserirAsync(Jogo jogo);
     Task AlterarAsync(Jogo jogo);
     Task DesativarAsync(int id);
@@ -63,6 +65,37 @@ public class JogoRepository : RepositoryBase, IJogoRepository
         AdicionarParametro(comando, "@id", id);
         await using var leitor = await comando.ExecuteReaderAsync();
         return await leitor.ReadAsync() ? Ler(leitor) : null;
+    }
+
+    public async Task<List<Jogo>> ListarPorIdsAsync(IEnumerable<int> ids)
+    {
+        var idsJogos = ids.Distinct().ToList();
+        if (idsJogos.Count == 0)
+            return [];
+
+        await using var conexao = await CriarConexaoAsync();
+        await using var comando = CriarComando(conexao,
+            $"SELECT {Colunas} FROM tb_jogo WHERE co_seq_jogo IN (" +
+            string.Join(",", idsJogos.Select((_, indice) => "@id" + indice)) + ")");
+        for (var indice = 0; indice < idsJogos.Count; indice++)
+            AdicionarParametro(comando, "@id" + indice, idsJogos[indice]);
+
+        var jogos = new List<Jogo>();
+        await using var leitor = await comando.ExecuteReaderAsync();
+        while (await leitor.ReadAsync())
+            jogos.Add(Ler(leitor));
+        return jogos;
+    }
+
+    public async Task<bool> BaixarEstoqueAsync(int id, int quantidade)
+    {
+        await using var conexao = await CriarConexaoAsync();
+        await using var comando = CriarComando(conexao,
+            "UPDATE tb_jogo SET qt_estoque = qt_estoque - @quantidade " +
+            "WHERE co_seq_jogo = @id AND st_ativo = TRUE AND qt_estoque >= @quantidade");
+        AdicionarParametro(comando, "@quantidade", quantidade);
+        AdicionarParametro(comando, "@id", id);
+        return await comando.ExecuteNonQueryAsync() == 1;
     }
 
     // dt_cadastro vem do banco, em UTC (Espec. 4.1).

@@ -4,6 +4,7 @@ import { jogoApi } from '../../api/servicos'
 import { obterMensagemErro } from '../../api/erros'
 import { formatarPreco } from '../../utils/formatar'
 import { Carregando, MensagemErro, EstadoVazio } from '../../components/MensagensEstado'
+import { useCarrinho } from '../../hooks/useCarrinho'
 
 const nomeDoGenero = (genero) => (typeof genero === 'string' ? genero : genero.nome)
 
@@ -13,6 +14,7 @@ export default function DetalheJogo() {
   const [carregando, setCarregando] = useState(true)
   const [naoEncontrado, setNaoEncontrado] = useState(false)
   const [erro, setErro] = useState('')
+  const { adicionar, quantidadeTotal } = useCarrinho()
 
   const carregarJogo = useCallback(() => {
     setCarregando(true)
@@ -53,9 +55,18 @@ export default function DetalheJogo() {
             <p className="small">Gêneros: {jogo.generos.map(nomeDoGenero).join(', ')}</p>
           )}
           <p className="h4">{formatarPreco(jogo.preco)}</p>
-          {jogo.estoque === 0
+          {jogo.estoque === 0 || !jogo.ativo
             ? <span className="badge text-bg-secondary">Esgotado</span>
-            : <span className="small text-muted">{jogo.estoque} em estoque</span>}
+            : (
+              <div className="d-flex align-items-center gap-3">
+                <span className="small text-muted">{jogo.estoque} em estoque</span>
+                <button type="button" className="btn btn-primary"
+                  onClick={() => adicionar(jogo)}>Adicionar ao carrinho</button>
+                {quantidadeTotal > 0 && (
+                  <Link className="btn btn-outline-secondary" to="/carrinho">Ver carrinho</Link>
+                )}
+              </div>
+            )}
         </article>
       )}
     </div>

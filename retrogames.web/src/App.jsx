@@ -8,6 +8,9 @@ import Jogos from './pages/Administracao/Jogos'
 import FormularioJogo from './pages/Administracao/FormularioJogo'
 import Plataforma from './pages/Auxiliares/Plataforma'
 import NaoEncontrada from './pages/NaoEncontrada/NaoEncontrada'
+import Cadastro from './pages/Cadastro/Cadastro'
+import Carrinho from './pages/Carrinho/Carrinho'
+import MeusPedidos from './pages/MeusPedidos/MeusPedidos'
 
 export default function App() {
   return (
@@ -16,6 +19,14 @@ export default function App() {
         <Route index element={<Catalogo />} />
         <Route path="jogos/:id" element={<DetalheJogo />} />
         <Route path="login" element={<Login />} />
+        <Route path="cadastro" element={<Cadastro />} />
+
+        <Route path="carrinho" element={<RotaProtegida />}>
+          <Route index element={<Carrinho />} />
+        </Route>
+        <Route path="meus-pedidos" element={<RotaProtegida />}>
+          <Route index element={<MeusPedidos />} />
+        </Route>
 
         <Route path="admin" element={<RotaProtegida somenteAdministrador />}>
           <Route path="jogos" element={<Jogos />} />
